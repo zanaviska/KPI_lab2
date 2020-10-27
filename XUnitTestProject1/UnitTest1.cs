@@ -36,7 +36,7 @@ namespace XUnitTestProject1
             //with smiles
             Assert.Equal("😅.txt", BaseFileWorker.GetFileName(pathToFiles + @"\😅.txt"));
             //with different extensions
-            Assert.Equal("a.cs", BaseFileWorker.GetFileName(pathToFiles + @"\a.cs"));
+            Assert.Equal("a.csc", BaseFileWorker.GetFileName(pathToFiles + @"\a.csc"));
             Assert.Equal("a.docx", BaseFileWorker.GetFileName(pathToFiles + @"\a.docx"));
             Assert.Equal("a.mp4", BaseFileWorker.GetFileName(pathToFiles + @"\a.mp4"));
             Assert.Equal("a.pptx", BaseFileWorker.GetFileName(pathToFiles + @"\a.pptx"));
@@ -83,8 +83,8 @@ namespace XUnitTestProject1
             Assert.Equal(pathToFiles + "\\😅.txt", BaseFileWorker.GetFullPath(pathToFiles + @"\😅.txt"));
             Assert.Equal(pathToFiles + "\\😅.txt", BaseFileWorker.GetFullPath(@"..\..\..\Files\😅.txt"));
             //with different extensions
-            Assert.Equal(pathToFiles + "\\a.cs", BaseFileWorker.GetFullPath(pathToFiles + @"\a.cs"));
-            Assert.Equal(pathToFiles + "\\a.cs", BaseFileWorker.GetFullPath(@"..\..\..\Files\a.cs"));
+            Assert.Equal(pathToFiles + "\\a.csc", BaseFileWorker.GetFullPath(pathToFiles + @"\a.csc"));
+            Assert.Equal(pathToFiles + "\\a.csc", BaseFileWorker.GetFullPath(@"..\..\..\Files\a.csc"));
             Assert.Equal(pathToFiles + "\\a.docx", BaseFileWorker.GetFullPath(pathToFiles + @"\a.docx"));
             Assert.Equal(pathToFiles + "\\a.docx", BaseFileWorker.GetFullPath(@"..\..\..\Files\a.docx"));
             Assert.Equal(pathToFiles + "\\a.mp4", BaseFileWorker.GetFullPath(@"..\..\..\Files\a.mp4"));
@@ -150,8 +150,8 @@ namespace XUnitTestProject1
             Assert.Equal(pathToFiles + "\\😂😂", BaseFileWorker.GetPath(pathToFiles + @"\😂😂\test.txt"));
             Assert.Equal(pathToFiles + "\\😂😂", BaseFileWorker.GetPath(@"..\..\..\Files\😂😂\test.txt"));
             //with different extensions
-            Assert.Equal(pathToFiles, BaseFileWorker.GetPath(pathToFiles + @"\a.cs"));
-            Assert.Equal(pathToFiles, BaseFileWorker.GetPath(@"..\..\..\Files\a.cs"));
+            Assert.Equal(pathToFiles, BaseFileWorker.GetPath(pathToFiles + @"\a.csc"));
+            Assert.Equal(pathToFiles, BaseFileWorker.GetPath(@"..\..\..\Files\a.csc"));
             Assert.Equal(pathToFiles, BaseFileWorker.GetPath(pathToFiles + @"\a.docx"));
             Assert.Equal(pathToFiles, BaseFileWorker.GetPath(@"..\..\..\Files\a.docx"));
             Assert.Equal(pathToFiles, BaseFileWorker.GetPath(@"..\..\..\Files\a.mp4"));
@@ -245,6 +245,36 @@ namespace XUnitTestProject1
             Directory.Delete(pathToFiles + "\\変更", true);
             Directory.Delete(pathToFiles + "\\123", true);
             Directory.Delete(pathToFiles + "\\456", true);
+        }
+        [Fact]
+        void TestReadAllforNull()
+        {
+            //read from nothing
+            Assert.Null(BaseFileWorker.ReadAll(""));
+            //read from non-existing file
+            Assert.Null(BaseFileWorker.ReadAll(pathToFiles + "//read_all.non_existed"));
+        }
+        [Fact]
+        void TestReadAllValid()
+        {
+            //read regular
+            Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\read_all.txt"));
+            Assert.Equal("123", BaseFileWorker.ReadAll(@"..\..\..\Files\read_all.txt"));
+            //read from file with non ascii symbols
+            Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\ції😴り.txt"));
+            Assert.Equal("123", BaseFileWorker.ReadAll(@"..\..\..\Files\ції😴り.txt"));
+            //read from file with non ascii text
+            Assert.Equal("ції😴り.txt", BaseFileWorker.ReadAll(pathToFiles + "read_all1.txt"));
+            Assert.Equal("ції😴り.txt", BaseFileWorker.ReadAll(@"..\..\..\Files\read_all1.txt"));
+            //read from file with few dots in name
+            Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\1.2.3.txt"));
+            Assert.Equal("123", BaseFileWorker.ReadAll(@"..\..\..\Files\1.2.3.txt"));
+            //read from file with different file formats
+            Assert.Equal("1", BaseFileWorker.ReadAll(pathToFiles + "\\a.csc"));
+            Assert.Equal("2", BaseFileWorker.ReadAll(pathToFiles + "\\a.docx"));
+            Assert.Equal("3", BaseFileWorker.ReadAll(pathToFiles + "\\a.mp4"));
+            Assert.Equal("4", BaseFileWorker.ReadAll(pathToFiles + "\\a.pptx"));
+            Assert.Equal("5", BaseFileWorker.ReadAll(pathToFiles + "\\a.torrent"));
         }
     }
 

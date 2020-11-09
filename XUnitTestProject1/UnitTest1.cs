@@ -352,16 +352,61 @@ namespace XUnitTestProject1
         void TestTryCopy()
         {
             //test with no file extension
-            Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", false, 0));
-            Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", false, 0));
-            //Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", false, -1));
-            //Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", false, -1));
             Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, 2));
             Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, 2));
             Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, 0));
             Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, 0));
             Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, -1));
             Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, -1));
+            File.Delete(pathToFiles + "\\copy_to.txt");
+
+            //test copy with non-latin name
+            Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", true, 2));
+            Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", true, 2));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", true, -1));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", true, -1));
+            File.Delete(pathToFiles + "\\ції😴り.txt1");
+
+            //test copy with few dots in name name
+            Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", true, 2));
+            Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", true, 2));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", true, -1));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", true, -1));
+            File.Delete(pathToFiles + "\\1.2.34.txt1");
+        }
+        [Fact]
+        void TestTryWriteFail()
+        {
+            //try write to empty
+            Assert.False(BaseFileWorker.TryCopy("", @"", true));
+
+            Func<Func<bool>, int> shouldThrow = (func) =>
+            {
+                try
+                {
+                    func();
+                }
+                catch (Exception e)
+                {
+                    Assert.Equal(1, 1);
+                    return 0;
+                };
+                Assert.Equal("", "Exception should have been thrown, but it isn't");
+                return 1;
+            };
+
+            //try to write to the existing file with disabled rewrite option
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\exist.txt", false, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\exist.txt", false, 2));
+        }
+        [Fact]
+        void TestTryWrite()
+        {
+
         }
     }
 

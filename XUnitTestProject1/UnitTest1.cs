@@ -382,9 +382,68 @@ namespace XUnitTestProject1
         void TestTryWriteFail()
         {
             //try write to empty
-            Assert.False(BaseFileWorker.TryCopy("", @"", true));
+            Assert.False(BaseFileWorker.TryWrite("", @"", -1));
+            Assert.False(BaseFileWorker.TryWrite("", @"", 0));
+            Assert.False(BaseFileWorker.TryWrite("", @"", 2));
 
-            Func<Func<bool>, int> shouldThrow = (func) =>
+        }
+        [Fact]
+        void TestTryWrite()
+        {
+            //test with no file extension
+            Assert.True(BaseFileWorker.TryWrite(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", 2));
+            Assert.True(BaseFileWorker.TryWrite(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", 2));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", 0));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", 0));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", -1));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", -1));
+            File.Delete(pathToFiles + "\\copy_to.txt");
+
+            //test copy with non-latin name
+            Assert.True(BaseFileWorker.TryWrite(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", 2));
+            Assert.True(BaseFileWorker.TryWrite(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", 2));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", 0));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", 0));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\ції😴り.txt", @"..\..\..\Files\ції😴り.txt1", -1));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\ції😴り.txt", pathToFiles + "\\ції😴り.txt1", -1));
+            File.Delete(pathToFiles + "\\ції😴り.txt1");
+
+            //test copy with few dots in name name
+            Assert.True(BaseFileWorker.TryWrite(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", 2));
+            Assert.True(BaseFileWorker.TryWrite(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", 2));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", 0));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", 0));
+            Assert.False(BaseFileWorker.TryWrite(@"..\..\..\Files\1.2.3.txt", @"..\..\..\Files\1.2.34.txt1", -1));
+            Assert.False(BaseFileWorker.TryWrite(pathToFiles + "\\1.2.3.txt", pathToFiles + "\\1.2.34.txt1", -1));
+            File.Delete(pathToFiles + "\\1.2.34.txt1");
+        }
+        [Fact]
+        void TestWrite()
+        {
+            //write to file without file
+            Assert.False(BaseFileWorker.Write("123", ""));
+
+            //write to file with no extension
+            Assert.True(BaseFileWorker.Write("123", pathToFiles + "\\copy_to"));
+            Assert.True(BaseFileWorker.Write("123", @"..\..\..\Files\to_copy"));
+
+            //write to existing file
+            Assert.True(BaseFileWorker.Write("1234", pathToFiles + "\\copy_to"));
+            Assert.True(BaseFileWorker.Write("1234", @"..\..\..\Files\to_copy"));
+            File.Delete(pathToFiles + "\\copy_to");
+            File.Delete(pathToFiles + "\\to_copy");
+
+            
+            //write to file empty text
+            Assert.True(BaseFileWorker.Write("", pathToFiles + "\\copy_to"));
+            Assert.True(BaseFileWorker.Write("", @"..\..\..\Files\to_copy"));
+            File.Delete(pathToFiles + "\\copy_to");
+            File.Delete(pathToFiles + "\\to_copy");
+
+            //write to file in non-existing folder
+            Assert.False(BaseFileWorker.Write("1", pathToFiles + "\\image\\copy_to"));
+            Assert.False(BaseFileWorker.Write("1", @"..\..\..\Files\image\to_copy"));
+            Func<Func<int>, int> shouldThrow = (func) =>
             {
                 try
                 {
@@ -398,14 +457,13 @@ namespace XUnitTestProject1
                 Assert.Equal("", "Exception should have been thrown, but it isn't");
                 return 1;
             };
+            shouldThrow(() => { Directory.Delete(pathToFiles + "\\image", true); return 1; });
 
-            //try to write to the existing file with disabled rewrite option
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\exist.txt", false, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\exist.txt", false, 2));
-        }
-        [Fact]
-        void TestTryWrite()
-        {
+            //write to file with non ASCII
+            Assert.True(BaseFileWorker.Write("ції😴り", pathToFiles + "\\ції😴り.temp"));
+            Assert.True(BaseFileWorker.Write("ції😴り", @"..\..\..\Files\ції😴り1.temp"));
+            File.Delete(pathToFiles + "\\ції😴り.temp");
+            File.Delete(pathToFiles + "\\ції😴り1.temp");
 
         }
     }

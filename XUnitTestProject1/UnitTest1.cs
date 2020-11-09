@@ -101,13 +101,13 @@ namespace XUnitTestProject1
             Assert.Null(BaseFileWorker.GetPath(pathToFiles));
             Assert.Null(BaseFileWorker.GetPath(@"..\..\..\Files"));
             //folder
-            Assert.Null(BaseFileWorker.GetPath(pathToFiles+"\\empty"));
+            Assert.Null(BaseFileWorker.GetPath(pathToFiles + "\\empty"));
             Assert.Null(BaseFileWorker.GetPath(@"..\..\..\Files\empty"));
             //non-existed file
-            Assert.Null(BaseFileWorker.GetPath(pathToFiles+"\\empty\\test.txt"));
+            Assert.Null(BaseFileWorker.GetPath(pathToFiles + "\\empty\\test.txt"));
             Assert.Null(BaseFileWorker.GetPath(@"..\..\..\Files\empty\test.txt"));
             //file but forgot to type extension
-            Assert.Null(BaseFileWorker.GetPath(pathToFiles+"\\test"));
+            Assert.Null(BaseFileWorker.GetPath(pathToFiles + "\\test"));
             Assert.Null(BaseFileWorker.GetPath(@"..\..\..\Files\test"));
         }
         [Fact]
@@ -260,11 +260,14 @@ namespace XUnitTestProject1
             //read regular
             Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\read_all.txt"));
             Assert.Equal("123", BaseFileWorker.ReadAll(@"..\..\..\Files\read_all.txt"));
+            //read with \n
+            Assert.Equal("I need a hero to save me now\r\nI need a hero (save me now)\r\nI need a hero to save my life\r\nA hero'll save me (just in time)", BaseFileWorker.ReadAll(pathToFiles + "\\text.txt"));
+            Assert.Equal("I need a hero to save me now\r\nI need a hero (save me now)\r\nI need a hero to save my life\r\nA hero'll save me (just in time)", BaseFileWorker.ReadAll(@"..\..\..\Files\text.txt"));
             //read from file with non ascii symbols
             Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\ції😴り.txt"));
             Assert.Equal("123", BaseFileWorker.ReadAll(@"..\..\..\Files\ції😴り.txt"));
             //read from file with non ascii text
-            Assert.Equal("ції😴り.txt", BaseFileWorker.ReadAll(pathToFiles + "read_all1.txt"));
+            Assert.Equal("ції😴り.txt", BaseFileWorker.ReadAll(pathToFiles + "\\read_all1.txt"));
             Assert.Equal("ції😴り.txt", BaseFileWorker.ReadAll(@"..\..\..\Files\read_all1.txt"));
             //read from file with few dots in name
             Assert.Equal("123", BaseFileWorker.ReadAll(pathToFiles + "\\1.2.3.txt"));
@@ -275,6 +278,90 @@ namespace XUnitTestProject1
             Assert.Equal("3", BaseFileWorker.ReadAll(pathToFiles + "\\a.mp4"));
             Assert.Equal("4", BaseFileWorker.ReadAll(pathToFiles + "\\a.pptx"));
             Assert.Equal("5", BaseFileWorker.ReadAll(pathToFiles + "\\a.torrent"));
+        }
+        [Fact]
+        void TestReadLines()
+        {
+            //read 1 regular line
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(pathToFiles + "\\read_all.txt"));
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(@"..\..\..\Files\read_all.txt"));
+            //read from file with non ascii symbols
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(pathToFiles + "\\ції😴り.txt"));
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(@"..\..\..\Files\ції😴り.txt"));
+            //read from file with non ascii text
+            Assert.Equal(new string[] { "ції😴り.txt" }, BaseFileWorker.ReadLines(pathToFiles + "\\read_all1.txt"));
+            Assert.Equal(new string[] { "ції😴り.txt" }, BaseFileWorker.ReadLines(@"..\..\..\Files\read_all1.txt"));
+            //read from file with few dots in name
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(pathToFiles + "\\1.2.3.txt"));
+            Assert.Equal(new string[] { "123" }, BaseFileWorker.ReadLines(@"..\..\..\Files\1.2.3.txt"));
+            //read from file with different file formats
+            Assert.Equal(new string[] { "1" }, BaseFileWorker.ReadLines(pathToFiles + "\\a.csc"));
+            Assert.Equal(new string[] { "2" }, BaseFileWorker.ReadLines(pathToFiles + "\\a.docx"));
+            Assert.Equal(new string[] { "3" }, BaseFileWorker.ReadLines(pathToFiles + "\\a.mp4"));
+            Assert.Equal(new string[] { "4" }, BaseFileWorker.ReadLines(pathToFiles + "\\a.pptx"));
+            Assert.Equal(new string[] { "5" }, BaseFileWorker.ReadLines(pathToFiles + "\\a.torrent"));
+            //read polyline file
+            string[] expected =
+            {
+                "I need a hero to save me now",
+                "I need a hero (save me now)",
+                "I need a hero to save my life",
+                "A hero'll save me (just in time)"
+            };
+            Assert.Equal(expected, BaseFileWorker.ReadLines(pathToFiles + "\\text.txt"));
+            Assert.Equal(expected, BaseFileWorker.ReadLines(@"..\..\..\Files\text.txt"));
+        }
+        [Fact]
+        void TestTryCopyFails()
+        {
+            //try copy from empty
+            Assert.False(BaseFileWorker.TryCopy("", @"..\..\..\Files\trycopyfalse.txt", true));
+            Assert.False(BaseFileWorker.TryCopy("", pathToFiles + "\\trycopyfalse.txt", true));
+
+            //try copy from non-existing file
+            Func<Func<bool>, int> shouldThrow = (func) =>
+            {
+                try
+                {
+                    func();
+                }
+                catch (Exception e)
+                {
+                    Assert.Equal(1, 1);
+                    return 0;
+                };
+                Assert.Equal("", "Exception should have been thrown, but it isn't");
+                return 1;
+            };
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", false, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", false, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", true, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", true, 2));
+
+            //try to copy and paste into the same file
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", true, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", true, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", false, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", false, 2));
+
+            //try to copy to the existing file with disabled rewrite option
+            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\exist.txt", false, 2));
+            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\exist.txt", false, 2));
+        }
+        [Fact]
+        void TestTryCopy()
+        {
+            //test with no file extension
+            Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", false, 0));
+            Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", false, 0));
+            //Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", false, -1));
+            //Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", false, -1));
+            Assert.True(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, 2));
+            Assert.True(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, 2));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, 0));
+            Assert.False(BaseFileWorker.TryCopy(@"..\..\..\Files\IIG", @"..\..\..\Files\copy_to.txt", true, -1));
+            Assert.False(BaseFileWorker.TryCopy(pathToFiles + "\\IIG", pathToFiles + "\\copy_to.txt", true, -1));
         }
     }
 

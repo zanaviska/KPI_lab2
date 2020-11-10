@@ -164,39 +164,26 @@ namespace XUnitTestProject1
         [Fact]
         public void MkDirErrorTest()
         {
-            Func<Func<string>, int> shouldThrow = (func) =>
-            {
-                try
-                {
-                    func();
-                }
-                catch (Exception e)
-                {
-                    Assert.Equal(1, 1);
-                    return 0;
-                };
-                Assert.Equal("", "Exception should have been thrown, but it isn't");
-                return 1;
-            };
+
             //create empty dir
-            shouldThrow(() => BaseFileWorker.MkDir("")); //Assert.Throws<ArgumentException>(() => BaseFileWorker.MkDir(""));// should do the same but doesnt works
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(""))); //Assert.Throws<ArgumentException>(() => BaseFileWorker.MkDir(""));// should do the same but doesnt works
             //create dir with invalid path/name
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test:123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test<123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test>123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test*123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test?123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test\"123"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\test|123"));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test:123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test<123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test>123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test*123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test?123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test\"123")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\test|123")));
             //create dir with forbiden name
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\CON"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\PRN"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\AUX"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\NUL"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\COM1"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\COM9"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\LPT1"));
-            shouldThrow(() => BaseFileWorker.MkDir(pathToFiles + "\\LPT9"));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\CON")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\PRN")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\AUX")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\NUL")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\COM1")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\COM9")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\LPT1")));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.MkDir(pathToFiles + "\\LPT9")));
         }
         [Fact]
         public void MkDirSuccessTest()
@@ -319,34 +306,21 @@ namespace XUnitTestProject1
             Assert.False(BaseFileWorker.TryCopy("", pathToFiles + "\\trycopyfalse.txt", true));
 
             //try copy from non-existing file
-            Func<Func<bool>, int> shouldThrow = (func) =>
-            {
-                try
-                {
-                    func();
-                }
-                catch (Exception e)
-                {
-                    Assert.Equal(1, 1);
-                    return 0;
-                };
-                Assert.Equal("", "Exception should have been thrown, but it isn't");
-                return 1;
-            };
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", false, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", false, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", true, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", true, 2));
+
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", false, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", false, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(@"..\..\..\Files\empty\trycopyfalse.txt", @"..\..\..\Files\trycopyfalse.txt", true, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(pathToFiles + "\\empty\\trycopyfalse.txt", pathToFiles + "\\trycopyfalse.txt", true, 2)));
 
             //try to copy and paste into the same file
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", true, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", true, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", false, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", false, 2));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", true, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", true, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\copy_from.txt", false, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\copy_from.txt", false, 2)));
 
             //try to copy to the existing file with disabled rewrite option
-            shouldThrow(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\exist.txt", false, 2));
-            shouldThrow(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\exist.txt", false, 2));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(@"..\..\..\Files\copy_from.txt", @"..\..\..\Files\exist.txt", false, 2)));
+            Assert.NotNull(Record.Exception(() => BaseFileWorker.TryCopy(pathToFiles + "\\copy_from.txt", pathToFiles + "\\exist.txt", false, 2)));
         }
         [Fact]
         void TestTryCopy()
@@ -443,22 +417,9 @@ namespace XUnitTestProject1
             //write to file in non-existing folder
             Assert.False(BaseFileWorker.Write("1", pathToFiles + "\\image\\copy_to"));
             Assert.False(BaseFileWorker.Write("1", @"..\..\..\Files\image\to_copy"));
-            Func<Func<int>, int> shouldThrow = (func) =>
-            {
-                try
-                {
-                    func();
-                }
-                catch (Exception e)
-                {
-                    Assert.Equal(1, 1);
-                    return 0;
-                };
-                Assert.Equal("", "Exception should have been thrown, but it isn't");
-                return 1;
-            };
-            shouldThrow(() => { Directory.Delete(pathToFiles + "\\image", true); return 1; });
 
+            Assert.NotNull(Record.Exception(() => Directory.Delete(pathToFiles + "\\image", true)));
+            Assert.NotNull(Record.Exception(() => Directory.Delete(pathToFiles + "\\image", true)));
             //write to file with non ASCII
             Assert.True(BaseFileWorker.Write("ції😴り", pathToFiles + "\\ції😴り.temp"));
             Assert.True(BaseFileWorker.Write("ції😴り", @"..\..\..\Files\ції😴り1.temp"));
